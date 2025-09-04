@@ -19,8 +19,8 @@ const connectDB = async () => {
 };
 connectDB();
 
-app.get("/", (req, res) => {
-  res.send("hello");
+app.get("/register", (req, res) => {
+  res.render("register");
 });
 
 app.post("/register", async (req, res) => {
