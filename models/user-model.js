@@ -12,7 +12,7 @@ const userModel = mongoose.Schema({
     minLength: 3,
     trim: true,
   },
-  emai: {
+  email: {
     type: String,
     required: true,
     unique: true,
