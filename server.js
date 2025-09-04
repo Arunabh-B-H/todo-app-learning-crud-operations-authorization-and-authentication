@@ -13,7 +13,7 @@ app.post("/register", async (req, res) => {
     email,
     password,
   });
-  res.send(`${user} is created`);
+  res.send(user);
 });
 
 app.listen(5000);
