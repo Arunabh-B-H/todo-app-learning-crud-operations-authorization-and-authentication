@@ -44,17 +44,12 @@ app.post("/login", async (req, res) => {
     return res.send("There is no such user");
   } else return res.send(user);
 });
-app.post("/add", async (req, res) => {
+app.post("/create new todo", async (req, res) => {
   let { title, description } = req.body;
   let todo = await todo.create({
     title,
     description,
   });
 });
-app.delete("/deletepost", async (req, res) => {
-  
-});
-
-
 
 app.listen(5000);
