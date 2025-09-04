@@ -1,4 +1,9 @@
 const mongoose = require("mongoose");
+
+mongoose
+  .connect("mongodb://127.0.0.1:27017/basic_todo_app")
+  .then(() => console.log("Connected to MongoDB successfully!"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 const userModel = mongoose.Schema({
   username: {
     type: String,

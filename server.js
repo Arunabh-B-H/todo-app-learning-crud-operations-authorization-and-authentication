@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+app.use(express.json()); // To parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // To parse form bodies
 const userModel = require("./models/user-model");
 
 app.get("/", (req, res) => {
