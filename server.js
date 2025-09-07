@@ -8,6 +8,8 @@ app.use(express.urlencoded({ extended: true })); // To parse form bodies
 
 app.set("view engine", "ejs");
 
+const sessions = {};
+
 const dbUri = "mongodb://127.0.0.1:27017/basic_todo_app";
 
 const connectDB = async () => {
@@ -20,13 +22,29 @@ const connectDB = async () => {
   }
 };
 connectDB();
+
+function checkSession(req, res, next) {
+  const sessionId = req.cookies.sessionId;
+  if (sessionId && sessions[sessionId]) {
+    req.user = sessions[sessionId];
+  } else {
+    req.user = null;
+  }
+  next();
+}
+
+app.use(checkSession);
+
 app.get("/", async (req, res) => {
   try {
-    const todos = await todoModel.find({}).sort({ createdAt: -1 });
-    const user = userModel.username;
-    res.render("home", { todos, user }); // Pass 'null' for the user
+    let todos = [];
+    let user = req.user;
+    if (req.user) {
+      todos = await todoModel.find({}).sort({ createdAt: -1 });
+    }
+    res.render("home", { todos, user });
   } catch (err) {
-    console.error("Error fetching todos:", err);
+    console.log("Error fetching todos:", err);
     res.status(500).send("Server Error");
   }
 });
@@ -39,13 +57,15 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  let { username, email, password } = req.body;
-  let user = await userModel.create({
-    username,
-    email,
-    password,
-  });
-  res.send(user);
+  try {
+    const { username, email, password } = req.body;
+    const newUser = new userModel({ username, email, password });
+    await newUser.save();
+    res.redirect("/login");
+  } catch (err) {
+    console.error("Error during registration:", err);
+    res.status(500).send("Server Error during registration.");
+  }
 });
 app.post("/login", async (req, res) => {
   let { email, password } = req.body;
