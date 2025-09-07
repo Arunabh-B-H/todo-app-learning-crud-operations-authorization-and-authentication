@@ -89,7 +89,11 @@ app.post("/register", async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
-    const newUser = new userModel({ username, email, password });
+    const newUser = new userModel({
+      username,
+      email,
+      password: hashedPassword,
+    });
     await newUser.save();
 
     const sessionId = Math.random().toString(36).substring(2, 15);
