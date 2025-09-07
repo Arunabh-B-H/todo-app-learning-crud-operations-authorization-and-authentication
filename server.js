@@ -110,15 +110,17 @@ app.post("/register", async (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     let { email, password } = req.body;
-    const user = await userModel.findOne({ email, password });
+
+    const user = await userModel.findOne({ email });
     if (!user) {
       return res.send("Invalid email or password");
     }
+
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log(password);
     if (!isMatch) {
-      res.send("Invalid password");
+      return res.send("Invalid email or password");
     }
+
     const sessionId = Math.random().toString(36).substring(2, 15);
     sessions[sessionId] = user;
     res.cookie("sessionId", sessionId, { httpOnly: true });
