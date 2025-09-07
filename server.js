@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const userModel = require("./models/user-model");
 const todoModel = require("./models/todo-model");
@@ -86,6 +87,8 @@ app.post("/register", async (req, res) => {
     if (existingUser) {
       return res.status(409).send("Username or email already exists.");
     }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(hashedPassword);
     const newUser = new userModel({ username, email, password });
     await newUser.save();
 
@@ -106,6 +109,11 @@ app.post("/login", async (req, res) => {
     const user = await userModel.findOne({ email, password });
     if (!user) {
       return res.send("Invalid email or password");
+    }
+    const isMatch = bcrypt.compare(password, user.password);
+    console.log(password);
+    if (!isMatch) {
+      res.send("Invalid password");
     }
     const sessionId = Math.random().toString(36).substring(2, 15);
     sessions[sessionId] = user;
