@@ -22,11 +22,12 @@ const connectDB = async () => {
 connectDB();
 app.get("/", async (req, res) => {
   try {
-    const todos = await todoModel.find({});
-    res.render("home", { todos: todos }); // Pass the todos array to the EJS file
-  } catch (error) {
-    console.error("Error fetching todos:", error);
-    res.status(500).send("Server error.");
+    const todos = await todoModel.find({}).sort({ createdAt: -1 });
+    const user = userModel.username;
+    res.render("home", { todos, user }); // Pass 'null' for the user
+  } catch (err) {
+    console.error("Error fetching todos:", err);
+    res.status(500).send("Server Error");
   }
 });
 
@@ -68,26 +69,25 @@ app.post("/delete/:id", async (req, res) => {
 });
 app.get("/edit/:id", async (req, res) => {
   try {
-    const todoId = req.params.id;
-    const todo = await todoModel.findById(todoId);
+    const todo = await Todo.findById(req.params.id);
     if (!todo) {
-      return res.send("Todo not found.");
+      return res.status(404).send("Todo not found");
     }
-    res.render("edit", { todo: todo });
-  } catch (error) {
-    console.error("Error fetching todo for edit:", error);
-    res.send("Server error.");
+    res.render("edit", { todo, user: req.user });
+  } catch (err) {
+    console.error("Error fetching todo for edit:", err);
+    res.status(500).send("Server Error");
   }
 });
 
 app.post("/edit/:id", async (req, res) => {
   try {
-    const todoId = req.params.id;
-    const { title, description } = req.body; 
-    await todoModel.findByIdAndUpdate(todoId, { title, description });
+    const { title, description } = req.body;
+    await Todo.findByIdAndUpdate(req.params.id, { title, description });
     res.redirect("/");
-  } catch (error) {
-    res.send("Server error." + error);
+  } catch (err) {
+    console.error("Error updating todo:", err);
+    res.status(500).send("Server Error");
   }
 });
 
