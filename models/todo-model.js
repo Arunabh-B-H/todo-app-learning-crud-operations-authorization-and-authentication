@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
-const todoSchema = mongoose.Schema({
+// Define the schema for a single todo item
+const todoSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -15,6 +16,15 @@ const todoSchema = mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  // Add a user field to link the todo to a specific user
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
-module.exports = mongoose.model("todo", todoSchema);
+// Create the 'Todo' model from the schema
+const Todo = mongoose.model("Todo", todoSchema);
+
+module.exports = Todo;
